@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()  # loads variables from .env
 
 LLMLAYER_API_KEY = os.getenv("LLMLAYER_API_KEY")
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
 
 
 client = LLMLayerClient(
