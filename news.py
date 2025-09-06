@@ -1,12 +1,10 @@
 import os
 from llmlayer import LLMLayerClient
 import requests
-from dotenv import load_dotenv
 
-load_dotenv()  # loads variables from .env
+LLMLAYER_API_KEY = os.environ["LLMLAYER_API_KEY"]
+DISCORD_WEBHOOK_URL = os.environ["DISCORD_WEBHOOK_URL"]
 
-LLMLAYER_API_KEY = os.getenv("LLMLAYER_API_KEY")
-DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
 
 
 client = LLMLayerClient(
