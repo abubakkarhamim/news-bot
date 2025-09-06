@@ -18,7 +18,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install requests llmlayer
+          pip install requests llmlayer python-dotenv
 
       - name: Run AI news script
         env:
