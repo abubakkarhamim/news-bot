@@ -1,0 +1,50 @@
+import os
+from llmlayer import LLMLayerClient
+import requests
+from dotenv import load_dotenv
+
+load_dotenv()  # loads variables from .env
+
+LLMLAYER_API_KEY = os.getenv("LLMLAYER_API_KEY")
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+
+
+client = LLMLayerClient(
+    api_key= LLMLAYER_API_KEY,
+)
+
+response = client.search(
+    query="search top 10 today news about bangladesh. The answer must be less than 20000 characters",
+    model="groq/llama-4-maverick-17b-128e-instruct",
+    domain_filter=["dhakatribune.com", "thedailystar.net", "tbsnews.net",],
+    return_sources= False,
+    location='bd',
+    response_language='en',
+    max_tokens=1500,
+    date_filter="day"
+
+)
+
+print(response.llm_response)
+news_content = response.llm_response
+
+# Print Source
+for source in response.sources:
+    print(f"- {source['title']}: {source['link']}")
+
+
+
+markdown_content = f"**LLMLayer Response:**\n{response.llm_response}\n\n**Sources:**\n"
+
+# Send to Discord
+discord_response = requests.post(
+    DISCORD_WEBHOOK_URL,
+    json={"content": news_content,
+          }
+)
+
+# Optional: check if it worked
+if discord_response.status_code == 204:
+    print("News sent to Discord successfully!")
+else:
+    print(f"Failed to send to Discord. Status code: {discord_response.status_code}")
