@@ -1,0 +1,28 @@
+name: Daily AI News
+
+on:
+  schedule:
+    - cron: "0 13 * * *"  # Runs at 1 PM UTC every day
+  workflow_dispatch:      # Allows manual run too
+
+jobs:
+  run-news-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install requests llmlayer
+
+      - name: Run AI news script
+        env:
+          LLMLAYER_API_KEY: ${{ secrets.LLMLAYER_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          python news.py
