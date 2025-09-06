@@ -29,12 +29,12 @@ print(response.llm_response)
 news_content = response.llm_response
 
 # Print Source
-for source in response.sources:
-    print(f"- {source['title']}: {source['link']}")
+# for source in response.sources:
+#     print(f"- {source['title']}: {source['link']}")
 
 
 
-markdown_content = f"**LLMLayer Response:**\n{response.llm_response}\n\n**Sources:**\n"
+# markdown_content = f"**LLMLayer Response:**\n{response.llm_response}\n\n**Sources:**\n"
 
 # Send to Discord
 discord_response = requests.post(
