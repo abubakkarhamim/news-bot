@@ -2,8 +2,8 @@ name: Daily AI News
 
 on:
   schedule:
-    - cron: "0 7 * * *"  # Runs at 1 PM Bangladesh time every day
-  workflow_dispatch:      # Allows manual run too      # Allows manual run too
+    - cron: "0 7 * * *"  # 
+  workflow_dispatch:      
 
 jobs:
   run-news-bot:
