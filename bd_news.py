@@ -12,7 +12,7 @@ client = LLMLayerClient(
 )
 
 response = client.search(
-    query="search top 5 today news about bangladesh with description. the combined message shouldn't exceed 1900 characters",
+    query="search top 10 today news about bangladesh. the combined message shouldn't exceed 1900 characters",
     model="groq/llama-4-maverick-17b-128e-instruct",
     domain_filter=["dhakatribune.com", "thedailystar.net", "tbsnews.net",],
     return_sources= False,
