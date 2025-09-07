@@ -18,7 +18,7 @@ response = client.search(
     return_sources= False,
     location='bd',
     response_language='en',
-    max_tokens=500,
+    max_tokens=480,
     date_filter="day",
     search_type = "news"
    
