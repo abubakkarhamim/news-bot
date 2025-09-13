@@ -24,7 +24,6 @@ response = client.search(
    
 
 )
-
 print(response.llm_response)
 news_content = response.llm_response
 
@@ -44,16 +43,23 @@ if current_chunk:
 
 # 2. Send each chunk to Discord one by one
 for i, chunk in enumerate(chunks):
-    print(f"Sending chunk {i+1}/{len(chunks)} to Discord...")
-    discord_response = requests.post(
-        DISCORD_WEBHOOK_URL,
-        json={"content": chunk}
-    )
+    # Skip sending if the chunk is empty or just whitespace
+    if not chunk.strip():
+        print(f"Skipping empty chunk {i+1}/{len(chunks)}.")
+        continue
 
-    if discord_response.status_code in [200, 204]:
+    print(f"Sending chunk {i+1}/{len(chunks)} to Discord...")
+    try:
+        discord_response = requests.post(
+            DISCORD_WEBHOOK_URL,
+            json={"content": chunk}
+        )
+        discord_response.raise_for_status()  # Raise an exception for bad status codes (4xx or 5xx)
+
         print(f"Chunk {i+1} sent successfully!")
-    else:
-        print(f"Failed to send chunk {i+1}. Status code: {discord_response.status_code}, Response: {discord_response.text}")
+
+    except requests.exceptions.RequestException as e:
+        print(f"Failed to send chunk {i+1}. Error: {e}")
     
     time.sleep(1) # Wait 1 second between messages to avoid rate limiting
 
@@ -61,11 +67,17 @@ for i, chunk in enumerate(chunks):
 if response.sources:
     source_content = "**Sources:**\n"
     for source in response.sources:
-        # Format as: - Title: <link>
-        source_content += f"- {source['title']}: <{source['link']}>\n"
+        # Check if source is a dictionary and has the required keys
+        if isinstance(source, dict) and 'title' in source and 'link' in source:
+            source_content += f"- {source['title']}: <{source['link']}>\n"
+        else:
+            print(f"Skipping malformed source item: {source}")
 
     # Check if sources list itself is too long and send
-    if len(source_content) > 0:
+    if len(source_content) > len("**Sources:**\n"):
         print("Sending sources to Discord...")
-        requests.post(DISCORD_WEBHOOK_URL, json={"content": source_content})
-        print("Sources sent to Discord.")
+        try:
+            requests.post(DISCORD_WEBHOOK_URL, json={"content": source_content})
+            print("Sources sent to Discord.")
+        except requests.exceptions.RequestException as e:
+            print(f"Failed to send sources. Error: {e}")
