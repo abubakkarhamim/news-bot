@@ -28,12 +28,7 @@ response = client.search(
 print(response.llm_response)
 news_content = response.llm_response
 
-# 1. Save the full response to output.txt
-with open('output.txt', 'w', encoding='utf-8') as f:
-    f.write(news_content)
-print("News content saved to output.txt")
-
-# 2. Break the content into chunks
+# 1. Break the content into chunks
 max_chars = 1950  # Keep it under 2000 to be safe
 chunks = []
 current_chunk = ""
@@ -47,7 +42,7 @@ for line in news_content.split('\n'):
 if current_chunk:
     chunks.append(current_chunk)
 
-# 3. Send each chunk to Discord one by one
+# 2. Send each chunk to Discord one by one
 for i, chunk in enumerate(chunks):
     print(f"Sending chunk {i+1}/{len(chunks)} to Discord...")
     discord_response = requests.post(
@@ -62,7 +57,7 @@ for i, chunk in enumerate(chunks):
     
     time.sleep(1) # Wait 1 second between messages to avoid rate limiting
 
-# 4. Also send the sources at the end
+# 3. Also send the sources at the end
 if response.sources:
     source_content = "**Sources:**\n"
     for source in response.sources:
