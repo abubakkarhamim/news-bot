@@ -58,8 +58,8 @@ for i, chunk in enumerate(chunks):
 
         print(f"Chunk {i+1} sent successfully!")
 
-    except requests.exceptions.RequestException as e:
-        print(f"Failed to send chunk {i+1}. Error: {e}")
+    except Exception as e:
+        print(f"An unexpected error occurred while sending chunk {i+1}. Error: {e}")
     
     time.sleep(1) # Wait 1 second between messages to avoid rate limiting
 
@@ -77,7 +77,8 @@ if response.sources:
     if len(source_content) > len("**Sources:**\n"):
         print("Sending sources to Discord...")
         try:
-            requests.post(DISCORD_WEBHOOK_URL, json={"content": source_content})
+            discord_response = requests.post(DISCORD_WEBHOOK_URL, json={"content": source_content})
+            discord_response.raise_for_status()
             print("Sources sent to Discord.")
-        except requests.exceptions.RequestException as e:
-            print(f"Failed to send sources. Error: {e}")
+        except Exception as e:
+            print(f"An unexpected error occurred while sending sources. Error: {e}")
