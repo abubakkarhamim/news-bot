@@ -42,6 +42,28 @@ for line in news_content.split('\n'):
 if current_chunk:
     chunks.append(current_chunk)
 
+# Prepare the sources content
+source_content = ""
+if response.sources:
+    sources_header = "**Sources:**\n"
+    temp_sources = ""
+    for source in response.sources:
+        # Check if source is a dictionary and has the required keys
+        if isinstance(source, dict) and 'title' in source and 'link' in source:
+            temp_sources += f"- {source['title']}: <{source['link']}>\n"
+        else:
+            print(f"Skipping malformed source item: {source}")
+    
+    if temp_sources:
+        source_content = sources_header + temp_sources
+
+# Attempt to append sources to the last chunk
+if chunks and source_content:
+    if len(chunks[-1]) + len(source_content) <= max_chars:
+        print("Appending sources to the last chunk.")
+        chunks[-1] += "\n" + source_content
+        source_content = "" # Clear sources since they are now combined
+
 # 2. Send each chunk to Discord one by one
 for i, chunk in enumerate(chunks):
     # Skip sending if the chunk is empty or just whitespace
@@ -64,22 +86,12 @@ for i, chunk in enumerate(chunks):
     
     time.sleep(1) # Wait 1 second between messages to avoid rate limiting
 
-# 3. Also send the sources at the end
-if response.sources:
-    source_content = "**Sources:**\n"
-    for source in response.sources:
-        # Check if source is a dictionary and has the required keys
-        if isinstance(source, dict) and 'title' in source and 'link' in source:
-            source_content += f"- {source['title']}: <{source['link']}>\n"
-        else:
-            print(f"Skipping malformed source item: {source}")
-
-    # Check if sources list itself is too long and send
-    if len(source_content) > len("**Sources:**\n"):
-        print("Sending sources to Discord...")
-        try:
-            discord_response = requests.post(DISCORD_WEBHOOK_URL, json={"content": source_content})
-            discord_response.raise_for_status()
-            print("Sources sent to Discord.")
-        except Exception as e:
-            print(f"An unexpected error occurred while sending sources. Error: {e}")
+# 3. Send sources separately if they couldn't be combined with the last chunk
+if source_content:
+    print("Sending sources separately as they could not fit in the last chunk.")
+    try:
+        discord_response = requests.post(DISCORD_WEBHOOK_URL, json={"content": source_content})
+        discord_response.raise_for_status()
+        print("Sources sent to Discord.")
+    except Exception as e:
+        print(f"An unexpected error occurred while sending sources. Error: {e}")
