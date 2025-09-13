@@ -13,7 +13,7 @@ client = LLMLayerClient(
 )
 
 response = client.search(
-    query="top 10 news about Bangladesh with detailed description",
+    query="top 10 news about Bangladesh with description",
     model="groq/llama-4-maverick-17b-128e-instruct",
     domain_filter=["dhakatribune.com", "thedailystar.net", "tbsnews.net",],
     return_sources= True,
